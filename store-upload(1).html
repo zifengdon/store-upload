@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>瑞幸咖啡 - 门店日周清返图上传</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .luckin-logo {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+        
+        .form-container {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .photo-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .photo-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .photo-item {
+            aspect-ratio: 1;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .photo-item:hover {
+            border-color: #667eea;
+            background: #f0f0ff;
+        }
+        
+        .photo-item .icon {
+            font-size: 30px;
+            color: #999;
+        }
+        
+        .photo-item .text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .photo-item.has-image .remove-btn {
+            display: block;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #333;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .toast.success {
+            background: #4caf50;
+        }
+        
+        .toast.error {
+            background: #f44336;
+        }
+        
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .preview-modal.show {
+            display: flex;
+        }
+        
+        .preview-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+        }
+        
+        .preview-modal .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .photo-count {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="luckin-logo">☕</div>
+            <h1>瑞幸咖啡</h1>
+            <p>门店日周清返图上传系统</p>
+        </div>
+        
+        <div class="form-container">
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label>门店名称</label>
+                    <input type="text" id="storeName" placeholder="请输入门店名称" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>上报日期</label>
+                    <input type="date" id="reportDate" required>
+                </div>
+                
+                <div class="photo-section">
+                    <h3>📸 日清返图 <span class="photo-count" id="dailyCount">0/9</span></h3>
+                    <div class="photo-grid" id="dailyPhotoGrid">
+                        <!-- 9个日清图片位 -->
+                    </div>
+                </div>
+                
+                <div class="photo-section">
+                    <h3>📷 周清返图 <span class="photo-count" id="weeklyCount">0/9</span></h3>
+                    <div class="photo-grid" id="weeklyPhotoGrid">
+                        <!-- 9个周清图片位 -->
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    提交上传
+                </button>
+            </form>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>上传中，请稍候...</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <div class="preview-modal" id="previewModal">
+        <button class="close-btn" onclick="closePreview()">✕</button>
+        <img id="previewImage" src="" alt="预览">
+    </div>
+    
+    <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
+    
+    <script>
+        // 配置区域 - 请填写您的阿里云函数计算API地址
+        const API_BASE_URL = 'https://your-service.cn-hangzhou.fc.aliyuncs.com/2016-08-15/proxy/your-service/handler';
+        
+        // 当前编辑状态
+        let currentPhotoType = null;
+        let dailyPhotos = [];
+        let weeklyPhotos = [];
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置默认日期为今天
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('reportDate').value = today;
+            
+            // 初始化图片网格
+            initPhotoGrids();
+            
+            // 绑定文件输入
+            const fileInput = document.getElementById('fileInput');
+            fileInput.addEventListener('change', handleFileSelect);
+            
+            // 绑定表单提交
+            document.getElementById('uploadForm').addEventListener('submit', handleSubmit);
+        });
+        
+        function initPhotoGrids() {
+            const dailyGrid = document.getElementById('dailyPhotoGrid');
+            const weeklyGrid = document.getElementById('weeklyPhotoGrid');
+            
+            // 初始化9个日清图片位
+            for (let i = 0; i < 9; i++) {
+                dailyGrid.appendChild(createPhotoSlot('daily', i));
+            }
+            
+            // 初始化9个周清图片位
+            for (let i = 0; i < 9; i++) {
+                weeklyGrid.appendChild(createPhotoSlot('weekly', i));
+            }
+        }
+        
+        function createPhotoSlot(type, index) {
+            const slot = document.createElement('div');
+            slot.className = 'photo-item';
+            slot.dataset.type = type;
+            slot.dataset.index = index;
+            slot.innerHTML = `
+                <span class="icon">+</span>
+                <span class="text">添加图片</span>
+                <button class="remove-btn" onclick="removePhoto(event, '${type}', ${index})">✕</button>
+            `;
+            slot.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('remove-btn')) {
+                    openFilePicker(type);
+                }
+            });
+            return slot;
+        }
+        
+        function openFilePicker(type) {
+            currentPhotoType = type;
+            document.getElementById('fileInput').click();
+        }
+        
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+            
+            files.forEach(file => {
+                if (!file.type.startsWith('image/')) {
+                    showToast('请选择图片文件', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    addPhoto(currentPhotoType, event.target.result);
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            // 清空input以允许重复选择同一文件
+            e.target.value = '';
+        }
+        
+        function addPhoto(type, dataUrl) {
+            const photos = type === 'daily' ? dailyPhotos : weeklyPhotos;
+            const count = type === 'daily' ? 'dailyCount' : 'weeklyCount';
+            
+            if (photos.length >= 9) {
+                showToast(`${type === 'daily' ? '日清' : '周清'}图片最多9张`, 'error');
+                return;
+            }
+            
+            photos.push(dataUrl);
+            updatePhotoGrid(type);
+            updatePhotoCount(type);
+        }
+        
+        function updatePhotoGrid(type) {
+            const photos = type === 'daily' ? dailyPhotos : weeklyPhotos;
+            const grid = document.getElementById(type === 'daily' ? 'dailyPhotoGrid' : 'weeklyPhotoGrid');
+            const slots = grid.querySelectorAll('.photo-item');
+            
+            slots.forEach((slot, index) => {
+                if (photos[index]) {
+                    slot.innerHTML = `
+                        <img src="${photos[index]}" alt="图片${index + 1}">
+                        <button class="remove-btn" onclick="removePhoto(event, '${type}', ${index})">✕</button>
+                    `;
+                    slot.classList.add('has-image');
+                    slot.querySelector('img').addEventListener('click', () => previewImage(photos[index]));
+                } else {
+                    slot.innerHTML = `
+                        <span class="icon">+</span>
+                        <span class="text">添加图片</span>
+                        <button class="remove-btn" onclick="removePhoto(event, '${type}', ${index})">✕</button>
+                    `;
+                    slot.classList.remove('has-image');
+                }
+            });
+        }
+        
+        function updatePhotoCount(type) {
+            const photos = type === 'daily' ? dailyPhotos : weeklyPhotos;
+            const countEl = document.getElementById(type === 'daily' ? 'dailyCount' : 'weeklyCount');
+            countEl.textContent = `${photos.length}/9`;
+        }
+        
+        function removePhoto(e, type, index) {
+            e.stopPropagation();
+            const photos = type === 'daily' ? dailyPhotos : weeklyPhotos;
+            photos.splice(index, 1);
+            updatePhotoGrid(type);
+            updatePhotoCount(type);
+        }
+        
+        function previewImage(src) {
+            document.getElementById('previewImage').src = src;
+            document.getElementById('previewModal').classList.add('show');
+        }
+        
+        function closePreview() {
+            document.getElementById('previewModal').classList.remove('show');
+        }
+        
+        async function handleSubmit(e) {
+            e.preventDefault();
+            
+            const storeName = document.getElementById('storeName').value.trim();
+            const reportDate = document.getElementById('reportDate').value;
+            
+            if (!storeName) {
+                showToast('请输入门店名称', 'error');
+                return;
+            }
+            
+            if (!reportDate) {
+                showToast('请选择上报日期', 'error');
+                return;
+            }
+            
+            if (dailyPhotos.length === 0 && weeklyPhotos.length === 0) {
+                showToast('请至少上传一张图片', 'error');
+                return;
+            }
+            
+            // 显示加载状态
+            document.getElementById('uploadForm').style.display = 'none';
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('submitBtn').disabled = true;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        storeName: storeName,
+                        reportDate: reportDate,
+                        dailyPhotos: dailyPhotos,
+                        weeklyPhotos: weeklyPhotos
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('上传成功！', 'success');
+                    // 清空表单
+                    dailyPhotos = [];
+                    weeklyPhotos = [];
+                    updatePhotoGrid('daily');
+                    updatePhotoGrid('weekly');
+                    updatePhotoCount('daily');
+                    updatePhotoCount('weekly');
+                    document.getElementById('storeName').value = '';
+                } else {
+                    showToast(result.error || '上传失败', 'error');
+                }
+            } catch (error) {
+                console.error('上传错误:', error);
+                showToast('网络错误，请检查API地址配置', 'error');
+            } finally {
+                document.getElementById('uploadForm').style.display = 'block';
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
