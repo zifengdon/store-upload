@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>瑞幸咖啡 - 门店日周清返图上传</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 16px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .header {
+            background: linear-gradient(135deg, #0071e3 0%, #005bb5 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px 12px 0 0;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .card {
+            background: white;
+            border-radius: 0 0 12px 12px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .form-group label span {
+            color: #ff4d4f;
+        }
+        .input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        .input:focus {
+            outline: none;
+            border-color: #0071e3;
+        }
+        .date-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+        }
+        .upload-area {
+            border: 2px dashed #d9d9d9;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+        .upload-area:hover {
+            border-color: #0071e3;
+            background: #f0f7ff;
+        }
+        .upload-area p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .upload-area .tip {
+            font-size: 12px;
+            color: #999;
+        }
+        .upload-icon {
+            font-size: 40px;
+            color: #0071e3;
+            margin-bottom: 10px;
+        }
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .preview-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 20px;
+            height: 20px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .photo-count {
+            font-size: 12px;
+            color: #0071e3;
+            margin-top: 8px;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #0071e3 0%, #005bb5 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .tips {
+            margin-top: 16px;
+            padding: 12px;
+            background: #fff7e6;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #ad6800;
+        }
+        .tips h4 {
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        .tips ul {
+            padding-left: 16px;
+        }
+        .tips li {
+            margin-bottom: 4px;
+        }
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .success-modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            max-width: 300px;
+            margin: 20px;
+        }
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            background: #52c41a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 30px;
+            color: white;
+        }
+        .modal-content h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .modal-content p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .modal-btn {
+            padding: 10px 30px;
+            background: #0071e3;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+        .loading.show {
+            display: flex;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0071e3;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>瑞幸咖啡</h1>
+            <p>门店日周清返图上传</p>
+        </div>
+        <div class="card">
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label>门店名称 <span>*</span></label>
+                    <input type="text" class="input" id="storeName" placeholder="请输入门店名称" required>
+                </div>
+                <div class="form-group">
+                    <label>日期 <span>*</span></label>
+                    <input type="date" class="date-input" id="reportDate" required>
+                </div>
+                <div class="form-group">
+                    <label>日清返图</label>
+                    <div class="upload-area" onclick="document.getElementById('dailyPhotos').click()">
+                        <div class="upload-icon">📷</div>
+                        <p>点击上传日清返图</p>
+                        <span class="tip">支持多选，可一次选择多张图片</span>
+                    </div>
+                    <input type="file" id="dailyPhotos" accept="image/*" multiple onchange="handleFileSelect(this, 'dailyPreview')">
+                    <div class="preview-container" id="dailyPreview"></div>
+                    <div class="photo-count" id="dailyCount"></div>
+                </div>
+                <div class="form-group">
+                    <label>周清返图</label>
+                    <div class="upload-area" onclick="document.getElementById('weeklyPhotos').click()">
+                        <div class="upload-icon">📸</div>
+                        <p>点击上传周清返图</p>
+                        <span class="tip">支持多选，可一次选择多张图片</span>
+                    </div>
+                    <input type="file" id="weeklyPhotos" accept="image/*" multiple onchange="handleFileSelect(this, 'weeklyPreview')">
+                    <div class="preview-container" id="weeklyPreview"></div>
+                    <div class="photo-count" id="weeklyCount"></div>
+                </div>
+                <button type="submit" class="submit-btn" id="submitBtn">提交返图</button>
+            </form>
+            <div class="tips">
+                <h4>📌 注意事项</h4>
+                <ul>
+                    <li>请确保图片清晰、可辨认</li>
+                    <li>日清返图和周清返图可分开提交</li>
+                    <li>提交后可在飞书多维表格中查看</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="success-modal" id="successModal">
+        <div class="modal-content">
+            <div class="success-icon">✓</div>
+            <h3>提交成功！</h3>
+            <p>您的返图已成功提交</p>
+            <button class="modal-btn" onclick="resetForm()">继续提交</button>
+        </div>
+    </div>
+
+    <script>
+        // 设置默认日期为今天
+        document.getElementById('reportDate').valueAsDate = new Date();
+
+        const dailyFiles = [];
+        const weeklyFiles = [];
+
+        function handleFileSelect(input, previewId) {
+            const files = Array.from(input.files);
+            const container = document.getElementById(previewId);
+            const countEl = document.getElementById(previewId.replace('Preview', 'Count'));
+            
+            if (previewId === 'dailyPreview') {
+                files.forEach(file => {
+                    if (!dailyFiles.some(f => f.name === file.name && f.size === file.size)) {
+                        dailyFiles.push(file);
+                    }
+                });
+            } else {
+                files.forEach(file => {
+                    if (!weeklyFiles.some(f => f.name === file.name && f.size === file.size)) {
+                        weeklyFiles.push(file);
+                    }
+                });
+            }
+
+            renderPreview(previewId, previewId === 'dailyPreview' ? dailyFiles : weeklyFiles, countEl);
+        }
+
+        function renderPreview(previewId, files, countEl) {
+            const container = document.getElementById(previewId);
+            container.innerHTML = '';
+            
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'preview-item';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" alt="">
+                        <button type="button" class="remove-btn" onclick="removeFile('${previewId}', ${index})">×</button>
+                    `;
+                    container.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            countEl.textContent = `已选择 ${files.length} 张图片`;
+        }
+
+        function removeFile(previewId, index) {
+            if (previewId === 'dailyPreview') {
+                dailyFiles.splice(index, 1);
+                renderPreview(previewId, dailyFiles, document.getElementById('dailyCount'));
+            } else {
+                weeklyFiles.splice(index, 1);
+                renderPreview(previewId, weeklyFiles, document.getElementById('weeklyCount'));
+            }
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const storeName = document.getElementById('storeName').value.trim();
+            const reportDate = document.getElementById('reportDate').value;
+            
+            if (!storeName) {
+                alert('请输入门店名称');
+                return;
+            }
+            if (!reportDate) {
+                alert('请选择日期');
+                return;
+            }
+            if (dailyFiles.length === 0 && weeklyFiles.length === 0) {
+                alert('请至少上传日清返图或周清返图');
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            
+            btn.disabled = true;
+            loading.classList.add('show');
+
+            try {
+                // 调用飞书API创建记录
+                const response = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        storeName,
+                        reportDate,
+                        dailyPhotos: dailyFiles,
+                        weeklyPhotos: weeklyFiles
+                    })
+                });
+
+                if (response.ok) {
+                    document.getElementById('successModal').classList.add('show');
+                } else {
+                    throw new Error('提交失败');
+                }
+            } catch (error) {
+                alert('提交失败，请重试');
+                btn.disabled = false;
+                loading.classList.remove('show');
+            }
+        });
+
+        function resetForm() {
+            document.getElementById('uploadForm').reset();
+            dailyFiles.length = 0;
+            weeklyFiles.length = 0;
+            document.getElementById('dailyPreview').innerHTML = '';
+            document.getElementById('weeklyPreview').innerHTML = '';
+            document.getElementById('dailyCount').textContent = '';
+            document.getElementById('weeklyCount').textContent = '';
+            document.getElementById('reportDate').valueAsDate = new Date();
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('successModal').classList.remove('show');
+            document.getElementById('loading').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
